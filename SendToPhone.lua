@@ -36,7 +36,7 @@ local function getSetting(key, default)
     return v
 end
 
-local PHONE_NUMBER = getSetting('phone_number', nil)
+local PHONE_KEY = { 'phone_number', 'phone_number_2', 'phone_number_3' }
 local TEMP_DIR = getSetting('temp_dir', '/tmp/send-to-phone')
 local MAX_SIZE = tonumber(getSetting('max_size', 2048))
 local JPEG_QUALITY = tonumber(getSetting('jpeg_quality', 0.9))
@@ -52,8 +52,8 @@ local function shellEscape(s)
     return "'" .. s:gsub("'", [['\'']]) .. "'"
 end
 
-local function sendViaiMessage(path)
-    local cmd = '/opt/homebrew/bin/imsg send --to ' .. shellEscape(PHONE_NUMBER)
+local function sendViaiMessage(path, number)
+    local cmd = '/opt/homebrew/bin/imsg send --to ' .. shellEscape(number)
         .. ' --file ' .. shellEscape(path)
     local result = run(cmd)
     if not result or not result:find('sent') then
@@ -63,10 +63,12 @@ local function sendViaiMessage(path)
     return true
 end
 
-function SendToPhone.send()
+function SendToPhone.send(slot)
+    slot = slot or 1
     LrTasks.startAsyncTask(function()
-        if not PHONE_NUMBER then
-            LrDialogs.showError('No phone number configured.\n\nRun setup.sh (or copy Config.lua.example to Config.lua and set your number), then reload the plugin.')
+        local number = getSetting(PHONE_KEY[slot] or 'phone_number', nil)
+        if not number then
+            LrDialogs.showError('No phone number configured for destination ' .. slot .. '.\n\nSet it in File > Plug-in Manager > Send to Phone (or copy Config.lua.example to Config.lua), then reload the plugin.')
             return
         end
 
@@ -131,7 +133,7 @@ function SendToPhone.send()
 
         myLogger:trace('Rendered: ' .. tostring(rendered))
 
-        local ok, err = sendViaiMessage(rendered)
+        local ok, err = sendViaiMessage(rendered, number)
         progress:done()
 
         if not ok then

@@ -1,3 +1,3 @@
 local SendToPhone = require 'SendToPhone'
 
-SendToPhone.send()
+SendToPhone.send(1)
