@@ -12,7 +12,14 @@ myLogger:enable('print')
 local SendToPhone = {}
 
 local TEMP_DIR = '/tmp/send-to-phone'
-local PHONE_NUMBER = '+15551234567' -- EDIT: your phone number
+
+-- Reads configuration from Config.lua (created by setup.sh; gitignored).
+-- Falls back to built-in defaults if the file is missing.
+local ok, config = pcall(require, 'Config')
+if not ok or type(config) ~= 'table' then
+    config = {}
+end
+local PHONE_NUMBER = config.phone_number
 
 local function run(cmd)
     local handle = io.popen(cmd .. ' 2>&1')
@@ -38,6 +45,11 @@ end
 
 function SendToPhone.send()
     LrTasks.startAsyncTask(function()
+        if not PHONE_NUMBER then
+            LrDialogs.showError('No phone number configured.\n\nRun setup.sh (or copy Config.lua.example to Config.lua and set your number), then reload the plugin.')
+            return
+        end
+
         local catalog = LrApplication.activeCatalog()
         local photo = catalog:getTargetPhoto()
         if not photo then

@@ -14,21 +14,40 @@ ready to post. No phone-side app, no iCloud Photos sync wait.
    handles the AppleScript attachment quirks of modern macOS.
 3. Cleans up the temp file.
 
+## Quickstart
+
+```bash
+git clone https://github.com/YashaVasilyev/send-to-phone-lightroom
+cd send-to-phone-lightroom
+./setup.sh
+```
+
+The script asks for your phone number, installs the [imsg](https://imsg.sh) CLI,
+installs the plugin into Lightroom's Modules folder, and binds the **⌥S**
+shortcut. Then quit and relaunch Lightroom Classic, grant Full Disk Access to
+Lightroom (one-time, see below), and you're done.
+
 ## Requirements
 
 - Lightroom Classic (tested on 26.6.2)
 - macOS with Messages signed in to the same Apple ID as your iPhone
-- [imsg](https://imsg.sh) CLI: `brew install steipete/tap/imsg`
+- [Homebrew](https://brew.sh) (setup.sh uses it to install imsg)
 - **Full Disk Access** granted to Lightroom Classic
   (System Settings > Privacy & Security > Full Disk Access) — imsg stages
   attachments inside `~/Library/Messages`.
 
-## Install
+## Manual install (alternative to quickstart)
 
-1. Clone or download this repo, then in Lightroom Classic:
-   **File > Plug-in Manager > Add** — select `send-to-phone.lrdevplugin`.
-2. Edit `PHONE_NUMBER` at the top of `SendToPhone.lua` to your own number.
-3. Optional keyboard shortcut (⌥S):
+1. Run `./setup.sh` anyway (it configures your phone number and shortcut), or:
+2. In Lightroom Classic: **File > Plug-in Manager > Add** — select
+   `send-to-phone.lrdevplugin`.
+3. Create your `Config.lua` (gitignored):
+
+   ```bash
+   cp Config.lua.example Config.lua   # then edit phone_number
+   ```
+
+4. Optional keyboard shortcut (⌥S):
 
    ```bash
    defaults write com.adobe.LightroomClassicCC7 NSUserKeyEquivalents -dict \

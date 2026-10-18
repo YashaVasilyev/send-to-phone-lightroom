@@ -1,0 +1,5 @@
+-- Copy this file to Config.lua and set your phone number.
+-- Config.lua is gitignored; setup.sh generates it automatically.
+return {
+    phone_number = '+15551234567',
+}
