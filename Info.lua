@@ -2,6 +2,7 @@ return {
     LrToolkitIdentifier = 'com.yash.sendtophone',
     LrPluginName = 'Send to Phone',
     LrSdkVersion = 6.0,
+    LrPluginManager = 'ManagerPanel.lua',
     LrPlugInExtrasMenuItems = {
         {
             title = 'Send to Phone',

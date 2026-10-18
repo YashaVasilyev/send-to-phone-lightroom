@@ -11,14 +11,35 @@ myLogger:enable('print')
 
 local SendToPhone = {}
 
--- Reads configuration from Config.lua (created by setup.sh; gitignored).
--- Falls back to built-in defaults if the file is missing.
+-- Configuration priority: plugin preferences (set in Plug-in Manager)
+-- > Config.lua (created by setup.sh; gitignored) > built-in defaults.
+local prefsOk, prefs = pcall(function()
+    return import 'LrPrefs':prefsForPlugin(_PLUGIN)
+end)
+if not prefsOk or type(prefs) ~= 'table' then
+    prefs = {}
+end
+
 local ok, config = pcall(require, 'Config')
 if not ok or type(config) ~= 'table' then
     config = {}
 end
-local PHONE_NUMBER = config.phone_number
-local TEMP_DIR = config.temp_dir or '/tmp/send-to-phone'
+
+local function getSetting(key, default)
+    local v = prefs[key]
+    if v == nil or v == '' then
+        v = config[key]
+    end
+    if v == nil or v == '' then
+        return default
+    end
+    return v
+end
+
+local PHONE_NUMBER = getSetting('phone_number', nil)
+local TEMP_DIR = getSetting('temp_dir', '/tmp/send-to-phone')
+local MAX_SIZE = tonumber(getSetting('max_size', 2048))
+local JPEG_QUALITY = tonumber(getSetting('jpeg_quality', 0.9))
 
 local function run(cmd)
     local handle = io.popen(cmd .. ' 2>&1')
@@ -78,10 +99,10 @@ function SendToPhone.send()
                     LR_tokenString = '{{filename}}-phone',
                     LR_collisionHandling = 'rename',
                     LR_format = 'JPEG',
-                    LR_jpeg_quality = 0.9,
+                    LR_jpeg_quality = JPEG_QUALITY or 0.9,
                     LR_size_doConstrain = true,
-                    LR_size_maxHeight = 2048,
-                    LR_size_maxWidth = 2048,
+                    LR_size_maxHeight = MAX_SIZE or 2048,
+                    LR_size_maxWidth = MAX_SIZE or 2048,
                     LR_minimizeEmbeddedMetadata = true,
                     LR_removeFaceRegions = true,
                     LR_embeddedMetadataOption = 'copyrightOnly',
