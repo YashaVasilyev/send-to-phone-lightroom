@@ -2,4 +2,5 @@
 -- Config.lua is gitignored; setup.sh generates it automatically.
 return {
     phone_number = '+15551234567',
+    -- temp_dir = '/tmp/send-to-phone',
 }

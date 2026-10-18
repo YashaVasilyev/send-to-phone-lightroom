@@ -11,8 +11,6 @@ myLogger:enable('print')
 
 local SendToPhone = {}
 
-local TEMP_DIR = '/tmp/send-to-phone'
-
 -- Reads configuration from Config.lua (created by setup.sh; gitignored).
 -- Falls back to built-in defaults if the file is missing.
 local ok, config = pcall(require, 'Config')
@@ -20,6 +18,7 @@ if not ok or type(config) ~= 'table' then
     config = {}
 end
 local PHONE_NUMBER = config.phone_number
+local TEMP_DIR = config.temp_dir or '/tmp/send-to-phone'
 
 local function run(cmd)
     local handle = io.popen(cmd .. ' 2>&1')
